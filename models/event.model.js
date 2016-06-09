@@ -35,35 +35,35 @@ var eventSchema = new Schema({
 	},
 
 
-	visited:{
+	visit:{
 		type:Number,
 		default:0
 	},
-	visited_gender:{
+	visit_gender:{
 		type:{},
 		default:{'male':0,'female':0}
 	},
-	visited_year:{}, // { '1':10 , '2':30  }
+	visit_year:{}, // { '1':10 , '2':30  }
 	
-	interested:{
+	interest:{
 		type:Number,
 		default:0
 	},
-	interested_gender:{
+	interest_gender:{
 		type:{},
 		default:{'male':0,'female':0}
 	},
 	interested_year:{}, // { '1':10 , '2':30  }
 	
-	joined:{
+	join:{
 		type:Number,
 		default:0
 	},
-	joined_gender:{
+	join_gender:{
 		type:{},
 		default:{'male':0,'female':0}
 	},
-	joined_year:{}, // { '1':10 , '2':30  }
+	join_year:{}, // { '1':10 , '2':30  }
 	join_per_day:[], // {month/day/year,number}
 	visit_per_day:[], // {month/day/year,number}
 	momentum:{type:Number,default:0},
@@ -74,7 +74,7 @@ var eventSchema = new Schema({
 		type:Boolean,
 		default: false
 	},
-	who_join: [String],
+	who_join: [],
 	created_date:{
 		type: Date,
 		default: Date.now

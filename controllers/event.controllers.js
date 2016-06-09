@@ -19,7 +19,7 @@ exports.getEvent = function(request,response,next){
 		else if(!event) response.status(404).send('event not found');
 		else{
 			var fields = ['title','about','video','channel','location','date_time','picture','picture_large','year_require','faculty_require'];
-			if(request.query.stat) fields.push(['visited']);
+			if(request.query.stat) fields.push(['visit']);
 			var info = {};
 			for(var i=0; i<fields.length; i++){
 				if(event[fields[i]]){
@@ -110,7 +110,7 @@ exports.getStat = function(request,response,next){
 			if(!event) response.status(404).send("event not found");
 			else{
 				var info={};
-				var fields = ['visited','visit_per_day'];
+				var fields = ['visit','visit_per_day'];
 				for(var i=0;i<fields.length;i++){
 					info[fields[i]]=event[fields[i]];
 				}
@@ -129,7 +129,7 @@ exports.putStat = function(request,response,next){
 		else if(!event) response.status(404).send('event not found');
 		else{
 			event.lastModified = d;
-			event.visited+=1;
+			event.visit+=1;
 			if(!event.visit_per_day[event.visit_per_day.length-1].hasOwnProperty(date)){
 				event.visit_per_day.push({});
 				event.visit_per_day[event.visit_per_day.length-1][date]=1;
