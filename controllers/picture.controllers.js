@@ -3,6 +3,7 @@ var multer = require('multer');
 var path = require('path');
 var Event = require('mongoose').model('Event');
 var Channel = require('mongoose').model('Channel');
+var mkdirp = require('mkdirp');
 
 exports.postPicture= function(request,response,next){
 	
@@ -72,20 +73,24 @@ exports.deletePicture = function(request,response,next){
 	var tmppath = '/../pictures/'+request.query.field+'/'+request.query.size;
 	var oldpath = path.join(__dirname,tmppath,request.params.name);
 	var newpath = path.join(__dirname,'/../pictures/bin/',request.params.name);
-	
-	Event.findById(request.query.id,function(err,event){
+	mkdirp(newpath,function(err){ 
 		if(err) return next(err);
-		else if(!event) response.send('event not found');
 		else{
-			if(request.query.size=='small') event.picture=null;
-			else event.picture_large.splice(event.picture_large.indexOf('http://188.166.190.3:1111/picture/'+request.params.name+'?field='+request.query.field+'&size='+request.query.size),1);
-			event.update(event,function(err){
+			Event.findById(request.query.id,function(err,event){
 				if(err) return next(err);
+				else if(!event) response.send('event not found');
 				else{
-					fs.rename(oldpath,newpath,function(err){
+					if(request.query.size=='small') event.picture=null;
+					else event.picture_large.splice(event.picture_large.indexOf('http://188.166.190.3:1111/picture/'+request.params.name+'?field='+request.query.field+'&size='+request.query.size),1);
+					event.update(event,function(err){
 						if(err) return next(err);
 						else{
-							response.send('done');
+							fs.rename(oldpath,newpath,function(err){
+								if(err) return next(err);
+								else{
+									response.send('done');
+								}
+							});
 						}
 					});
 				}
@@ -93,3 +98,11 @@ exports.deletePicture = function(request,response,next){
 		}
 	});
 }
+
+
+
+
+
+
+
+
