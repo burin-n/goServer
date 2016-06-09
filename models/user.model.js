@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var userSchema = new Schema({
+	
 //personal infomation
 	name:String,
 	picture:String,
@@ -18,6 +19,7 @@ var userSchema = new Schema({
 
 //stat
 	tag_visit:{},
+	event_visit:{},
 	channel_visit:{},
 
 
