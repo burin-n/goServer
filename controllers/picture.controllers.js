@@ -10,56 +10,60 @@ exports.postPicture= function(request,response,next){
 	dest = './pictures/'+request.query.field;
 	
 	dest += (request.query.size=='large') ? '/large' : '/small'; 
-
-	var storage = multer.diskStorage({
-		destination: function(request,file,callback){
-			callback(null,dest);
-		},
-		filename: function(request,file,callback){
-			callback(null,(Math.random()+1).toString(36).substring(7)+Date.now()+path.extname(file.originalname));
-		}
-	});
-	var upload = multer({storage:storage}).single('picture');
-	if(request.query.field=='event'){
-		Event.findById(request.query.id,function(err,event){
-			if(err) return next(err);
-			else if(!event) response.send('event not found')
-			else{
-				upload(request,response,function(err){
-				 	if(err) return next(err);
-				 	else{
-						url = 'http://188.166.190.3:1111/picture/'+request.file.filename+'?field='+request.query.field+'&size='+request.query.size;
-						if(request.query.size=='small') event.picture = url;
-						else event.picture_large.push(url);
-						event.update(event,function(err){
-							if(err) return next(err);
-							else response.status(201).send('done');	
+	mkdirp(dest,function(err){
+		if(err) return next(err);
+		else{
+			var storage = multer.diskStorage({
+				destination: function(request,file,callback){
+					callback(null,dest);
+				},
+				filename: function(request,file,callback){
+					callback(null,(Math.random()+1).toString(36).substring(7)+Date.now()+path.extname(file.originalname));
+				}
+			});
+			var upload = multer({storage:storage}).single('picture');
+			if(request.query.field=='event'){
+				Event.findById(request.query.id,function(err,event){
+					if(err) return next(err);
+					else if(!event) response.send('event not found')
+					else{
+						upload(request,response,function(err){
+						 	if(err) return next(err);
+						 	else{
+								url = 'http://188.166.190.3:1111/picture/'+request.file.filename+'?field='+request.query.field+'&size='+request.query.size;
+								if(request.query.size=='small') event.picture = url;
+								else event.picture_large.push(url);
+								event.update(event,function(err){
+									if(err) return next(err);
+									else response.status(201).send('done');	
+								});
+							}
 						});
 					}
 				});
 			}
-		});
-	}
-	else{
-		Channel.findById(request.query.id,function(err,channel){
-			if(err) return next(err);
-			else if(!channel) response.send('channel not found');
 			else{
-				upload(request,response,function(err){
+				Channel.findById(request.query.id,function(err,channel){
 					if(err) return next(err);
+					else if(!channel) response.send('channel not found');
 					else{
-						url = 'http://188.166.190.3:1111/picture/'+request.file.filename+'?field='+request.query.field+'&size='+request.query.size;
-						if(request.query.size=='small')	channel['picture']=url
-						else channel['picture_large']=url;
-						channel.update(channel,function(err){
+						upload(request,response,function(err){
 							if(err) return next(err);
-							else response.status(201).send('done');	
-						});	
+							else{
+								url = 'http://188.166.190.3:1111/picture/'+request.file.filename+'?field='+request.query.field+'&size='+request.query.size;
+								if(request.query.size=='small')	channel['picture']=url
+								else channel['picture_large']=url;
+								channel.update(channel,function(err){
+									if(err) return next(err);
+									else response.status(201).send('done');	
+								});	
+							}
+						});
 					}
 				});
 			}
-		});
-	}
+		}
+	});
 }
 
 
@@ -73,7 +77,7 @@ exports.deletePicture = function(request,response,next){
 	var tmppath = '/../pictures/'+request.query.field+'/'+request.query.size;
 	var oldpath = path.join(__dirname,tmppath,request.params.name);
 	var newpath = path.join(__dirname,'/../pictures/bin/',request.params.name);
-	mkdirp(newpath,function(err){ 
+	mkdirp(path.join(__dirname,'/../pictures/bin'),function(err){ 
 		if(err) return next(err);
 		else{
 			Event.findById(request.query.id,function(err,event){
@@ -98,11 +102,3 @@ exports.deletePicture = function(request,response,next){
 		}
 	});
 }
-
-
-
-
-
-
-
-
