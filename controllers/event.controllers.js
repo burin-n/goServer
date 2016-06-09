@@ -3,6 +3,8 @@ var Channel = require('mongoose').model('Channel');
 var fs = require('fs');
 var path = require('path');
 var time = require('time');
+var mkdirp = require('mkdirp');
+
 exports.listAll = function(request,response,next){
 	Event.find({},function(err,events){
 		if(err) return next(err);
@@ -252,12 +254,15 @@ exports.updatehotEvent = function(request,response,next){
  				result[key][field[i]] = hot[key][field[i]];
  			}
  		}
-
- 		fs.writeFile(path.join(__dirname,'../data/hotEvent.json'),JSON.stringify(result,null,2),function(err,data){
- 			if(err) return next(err);
- 			else response.send('done');
- 		});		
- 		
+ 		mkdirp(path.join(__dirname,'../data/'),function(err){
+	 		if(err) return next(err);
+	 		else{
+		 		fs.writeFile(path.join(__dirname,'../data/hotEvent.json'),JSON.stringify(result,null,2),function(err,data){
+		 			if(err) return next(err);
+		 			else response.send('done');
+		 		});		
+	 		}
+ 		});
  	});
 }
 

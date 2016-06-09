@@ -3,3 +3,6 @@
 *.JPG
 *.PNG
 node_modules/
+data/
+pictures/
+
