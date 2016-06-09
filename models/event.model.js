@@ -22,6 +22,7 @@ var eventSchema = new Schema({
 	location:String,
 	date_time: String,
 	contact_information: String,
+	tags:[],
 	
 	//stat-----------------------------------------------
 	rating:{
@@ -40,7 +41,7 @@ var eventSchema = new Schema({
 	},
 	visited_gender:{
 		type:{},
-		default:{'m':0,'f':0}
+		default:{'male':0,'female':0}
 	},
 	visited_year:{}, // { '1':10 , '2':30  }
 	
@@ -50,7 +51,7 @@ var eventSchema = new Schema({
 	},
 	interested_gender:{
 		type:{},
-		default:{'m':0,'f':0}
+		default:{'male':0,'female':0}
 	},
 	interested_year:{}, // { '1':10 , '2':30  }
 	
@@ -60,7 +61,7 @@ var eventSchema = new Schema({
 	},
 	joined_gender:{
 		type:{},
-		default:{'m':0,'f':0}
+		default:{'male':0,'female':0}
 	},
 	joined_year:{}, // { '1':10 , '2':30  }
 	join_per_day:[], // {month/day/year,number}
