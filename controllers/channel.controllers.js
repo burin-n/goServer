@@ -75,15 +75,15 @@ exports.deleteChannel = function(request,response,next){
 }
 
 var calStat = function(channel,callback){
-    var info={visited:0};
+    var info={visit:0};
         Event.find({_id: {$in:channel.events}},function(err,events){
             if(err) return next(err);
             else if(events){
                	console.log(events);
                 events.forEach(function(event){
-                    info.visited += event.visited;
-                	console.log('event.visited:'+event.visited);
-                	console.log(info.visited);             
+                    info.visit += event.visit;
+                	console.log('event.visit:'+event.visit);
+                	console.log(info.visit);             
                 });
                 
                 console.log(info);
