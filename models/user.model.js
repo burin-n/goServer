@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var userSchema = new Schema({
-	
+
 //personal infomation
 	name:String,
 	picture:String,
@@ -10,6 +10,7 @@ var userSchema = new Schema({
 	phone:String,
 	shirt_size:String,
 	regId:String,
+	facebookId:String,
 	facebookData:{},
 	
 	own_channels:[],
@@ -40,3 +41,5 @@ var userSchema = new Schema({
 		default: Date.now
 	}
 });
+
+mongoose.model('User',userSchema);
