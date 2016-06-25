@@ -8,5 +8,6 @@ module.exports = function(){
 	
 	require('../models/event.model'); // create collection
 	require('../models/channel.model');
+	require('../models/event.model');
 	return db;
 }

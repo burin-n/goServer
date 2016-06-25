@@ -225,7 +225,7 @@ var checkhot = function(hot,event){
 		hot['third'] = hot['second'];
 		hot['second'] = event;
 	}
-	else if(!hot['third'] || event.momentum>=hoกกt.third.momentum)	hot['third']=event;
+	else if(!hot['third'] || event.momentum>=hot.third.momentum)	hot['third']=event;
 	return hot;
 }
 

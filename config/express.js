@@ -26,5 +26,6 @@ module.exports = function(){
 	require('../routes/channel.routes')(app);
 	require('../routes/search.routes')(app);
 	require('../routes/login.routes')(app);
+	require('../routes/user.routes')(app);
 	return app;
 }	
