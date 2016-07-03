@@ -4,3 +4,31 @@
 		get user info
 		post user
 		user routes
+
+
+3 JUL
+	add 
+		tag.contollers
+			- modify
+			- get
+			- search
+		tag.route
+
+		con updateUser
+		
+		express tag route
+
+
+	update
+		getInfo
+			now return tags
+		searchEvent 
+			now return pic,channel
+
+
+ 	move routes and controllers
+		search channel -> channel
+		search event -> event
+		search tag -> tag
+
+		

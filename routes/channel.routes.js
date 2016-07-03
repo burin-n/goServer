@@ -14,5 +14,6 @@ module.exports = function(app){
 	app.get('/channel/stat',channel.getStat);
 
 
+	app.get('/channel/search',channel.searchChannel);
 
 }

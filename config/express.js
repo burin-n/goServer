@@ -24,8 +24,9 @@ module.exports = function(){
 	require('../routes/picture.routes')(app);
 	require('../routes/event.routes')(app);
 	require('../routes/channel.routes')(app);
-	require('../routes/search.routes')(app);
+	require('../routes/tag.routes')(app);
 	require('../routes/login.routes')(app);
 	require('../routes/user.routes')(app);
+
 	return app;
 }	

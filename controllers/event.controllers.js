@@ -18,7 +18,7 @@ exports.getEvent = function(request,response,next){
 		if(err) return next(err);
 		else if(!event) response.status(404).send('event not found');
 		else{
-			var fields = ['title','about','video','channel','location','date_time','picture','picture_large','year_require','faculty_require'];
+			var fields = ['title','about','video','channel','location','date_time','picture','picture_large','year_require','faculty_require','tags'];
 			if(request.query.stat) fields.push(['visit']);
 			var info = {};
 			for(var i=0; i<fields.length; i++){
@@ -274,4 +274,23 @@ exports.gethotEvent = function(request,response,next){
 
 
 
+
+exports.searchEvent = function(request,response,next){
+	Event.find( {$and : [ {title: { $regex:request.query.keyword,$options:"i"}}, {tokenDelete:false}] } ,
+		function(err,events){
+			if(err) return next(err);
+			else if(events.length==0) response.status(404).send('event not found');
+			else {
+				var fields = ['_id','title','picture','channel'];
+				var info = [];
+				for(var j=0; j<events.length;j++){
+					info.push({});
+					for(var i=0; i<fields.length; i++){
+					 	info[j][fields[i]] = events[j][fields[i]];
+					}
+				}
+				response.json(info);
+			}
+	});
+}
 

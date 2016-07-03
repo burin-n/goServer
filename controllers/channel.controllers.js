@@ -117,6 +117,25 @@ exports.clear = function(request,response,next){
 
 
 
+exports.searchChannel = function(request,response,next){
+	Channel.find({$and : [ {name: { $regex:request.query.keyword,$options:"i"}}, {tokenDelete:false}] },
+		function(err,channels){
+			if(err) return next(err);
+			else if(channels.length==0) response.status(404).send('channel not found');
+			else {
+				var fields = ['_id','name'];
+				var info = [];
+				for(var j=0; j<channels.length;j++){
+					info.push({});
+					for(var i=0; i<fields.length; i++){
+					 	info[j][fields[i]] = channels[j][fields[i]];
+					}
+				}
+				response.json(info);
+			}
+	});
+}
+
 
 
 

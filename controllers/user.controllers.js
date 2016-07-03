@@ -32,3 +32,16 @@ exports.postUser = function(request,response){
 		else response.status(201).send(newU.id);
 	});
 }
+
+exports.updateUser = function(request,response){
+	var id = mongoose.Types.ObjectId(request.params.id);
+	console.log(id);
+	User.findByIdAndUpdate(id,{
+		$set : request.body,
+		$currentDate:{lastModified:"Date"}
+	},function(err,user){
+		if(err) return next(err);
+		else if(!user) response.send('user not found');
+		else response.send('done');
+	});
+}
