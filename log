@@ -31,4 +31,10 @@
 		search event -> event
 		search tag -> tag
 
+	-------
+	update
+		search tags
+			now use GET and query 
+		get tags
+			now return json
 		

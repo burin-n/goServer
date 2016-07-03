@@ -18,17 +18,11 @@ exports.modifyTag = function(request,response){
 
 
 exports.getTags = function(request,response){
-	var result = [];
-	var data = JSON.parse(fs.readFileSync(path.join(__dirname,'../data/tags.json')));
-	data.tags.forEach(function(tag){
-		result.push(tag);
-	});
-	response.send(result);
-
+	response.sendFile(path.join(__dirname,'../data/tags.json'));
 }
 
 exports.searchTag = function(request,response,next){
-        Event.find( { $and : [ {tags: {$in : request.body.keywords }}, {tokenDelete: false} ] },
+        Event.find( { $and : [ {tags: {$in : request.query.keywords }}, {tokenDelete: false} ] },
                 function(err,events){
                     if(err) return next(err);
                     else if(events.length==0) response.status(404).send('event not found');
