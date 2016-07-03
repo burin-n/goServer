@@ -2,7 +2,7 @@ var request = require('request');
 var cronjob = require('cron').CronJob;
 
 module.exports = function(){
-	var job = new cronjob('00 30 * * * *',function(){
+	var job = new cronjob('00 00 00 * * *',function(){
 		request({
 			uri: "http://188.166.190.3:1111/update/hot",
 			method: "get"

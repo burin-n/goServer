@@ -22,12 +22,14 @@ exports.getTags = function(request,response){
 }
 
 exports.searchTag = function(request,response,next){
-        Event.find( { $and : [ {tags: {$in : request.query.keywords }}, {tokenDelete: false} ] },
+        var keys = request.query.keywords.split(',');
+        console.log(keys);
+        Event.find( { $and : [ {tags: {$in : keys }}, {tokenDelete: false} ] },
                 function(err,events){
                     if(err) return next(err);
                     else if(events.length==0) response.status(404).send('event not found');
                     else {
-                            var fields = ['_id','title','picture','channel'];
+                            var fields = ['_id','title','picture','channel','tags'];
                             var info = [];
                             for(var j=0; j<events.length;j++){
                                     info.push({});
