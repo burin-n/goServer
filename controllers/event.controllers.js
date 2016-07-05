@@ -281,7 +281,7 @@ exports.searchEvent = function(request,response,next){
 			if(err) return next(err);
 			else if(events.length==0) response.status(404).send('event not found');
 			else {
-				var fields = ['_id','title','picture','channel'];
+				var fields = ['_id','title','picture','channel','location','date_time'];
 				var info = [];
 				for(var j=0; j<events.length;j++){
 					info.push({});
