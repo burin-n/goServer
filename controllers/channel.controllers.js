@@ -123,7 +123,7 @@ exports.searchChannel = function(request,response,next){
 			if(err) return next(err);
 			else if(channels.length==0) response.status(404).send('channel not found');
 			else {
-				var fields = ['_id','name'];
+				var fields = ['_id','name','picture'];
 				var info = [];
 				for(var j=0; j<channels.length;j++){
 					info.push({});

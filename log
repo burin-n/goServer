@@ -44,3 +44,5 @@
 	update
 		tags/search
 			now return event that has all keywords
+		channel/search
+			now return picture
