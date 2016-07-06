@@ -24,7 +24,7 @@ exports.getTags = function(request,response){
 exports.searchTag = function(request,response,next){
         var keys = request.query.keywords.split(',');
         console.log(keys);
-        Event.find( { $and : [ {tags: {$in : keys }}, {tokenDelete: false} ] },
+        Event.find( { $and : [ {tags: {$all : keys }}, {tokenDelete: false} ] },
                 function(err,events){
                     if(err) return next(err);
                     else if(events.length==0) response.status(404).send('event not found');

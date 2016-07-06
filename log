@@ -39,3 +39,8 @@
 			now return json
 		
 	abcdefg
+
+6 JUN
+	update
+		tags/search
+			now return event that has all keywords
