@@ -46,3 +46,6 @@
 			now return event that has all keywords
 		channel/search
 			now return picture
+11 JUN
+	add
+		cors

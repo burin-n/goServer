@@ -3,6 +3,7 @@ var morgan = require('morgan');
 var compression = require('compression');
 var bodyParser = require('body-parser');
 var multer = require('multer');
+var cors = require('cors');
 module.exports = function(){
 	
 	var app = express();
@@ -17,7 +18,7 @@ module.exports = function(){
 		extended: true
 	}));
 	app.use(bodyParser.json());
-
+	app.use(cors());
 	// setting environment ---------------------------------------
 
 
