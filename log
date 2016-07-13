@@ -49,3 +49,27 @@
 11 JUN
 	add
 		cors
+
+13 JUN
+		
+	update			
+		event model :
+			delete date_time
+			add date_start,date_end,old
+
+		event controllers :
+			updatetStatperDay
+				no more add visit per day if no visitor
+				check if event is past
+			updatehotEvent
+				adjust code for skipping visit per day
+			getEvent
+				now return old
+				
+
+
+
+
+
+
+

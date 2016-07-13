@@ -20,10 +20,14 @@ var eventSchema = new Schema({
 	year_require:[],
 	agreement :String,
 	location:String,
-	date_time: String,
+	date_start: Date,
+	date_end:Date,
 	contact_information: String,
 	tags:[],
-	
+	old:{
+		type:Boolean,
+		default:false
+	},
 	//stat-----------------------------------------------
 	rating:{
 		type:Number,
