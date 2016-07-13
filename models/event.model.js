@@ -24,7 +24,7 @@ var eventSchema = new Schema({
 	date_end:Date,
 	contact_information: String,
 	tags:[],
-	old:{
+	expire:{
 		type:Boolean,
 		default:false
 	},
