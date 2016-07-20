@@ -20,4 +20,6 @@ module.exports = function(app){
 
 //--------------------------------------------------//
  	app.get('/event/search',event.searchEvent);
+
+ 	app.get('/',event.hi);
 }	

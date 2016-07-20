@@ -5,6 +5,10 @@ var path = require('path');
 var time = require('time');
 var mkdirp = require('mkdirp');
 
+exports.hi = function(request,response,next){
+	response.send('hi');
+}
+
 exports.listAll = function(request,response,next){
 	Event.find({},function(err,events){
 		if(err) return next(err);
