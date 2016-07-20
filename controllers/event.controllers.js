@@ -224,7 +224,7 @@ exports.updatehotEvent = function(request,response,next){
  	var d2 = d1-86400000;
  	var d3 = d2-86400000;
 
- 	console.log(d1.toString());
+ 	
  	Event.find({tokenDelete:{$ne:true}},function(err,events){
  		for(var i=0;i<events.length;i++){
  			events[i].momentum = 0;
@@ -266,6 +266,29 @@ exports.updatehotEvent = function(request,response,next){
 			 			}
 	 				}
  				}
+ 			}
+ 			if(t<0){
+ 				hot = checkhot(hot,events[i]);
+		 		if(i+1==events.length){
+					var field = ['_id','title','picture','momentum'];
+					var result={};
+					for(var key in hot){
+			 			result[key] = {};
+			 			for(var i=0;i<field.length;i++){
+			 				result[key][field[i]] = hot[key][field[i]];
+			 			}
+			 		}
+			 		mkdirp(path.join(__dirname,'../data/'),function(err){
+				 		if(err) return next(err);
+				 		else{
+					 		fs.writeFile(path.join(__dirname,'../data/hotEvent.json'),
+					 			JSON.stringify(result,null,2),function(err,data){
+					 			if(err) return next(err);
+					 			else response.send('done');
+					 		});		
+				 		}
+			 		});
+	 			}				
  			}
  		}
  	});

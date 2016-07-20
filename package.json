@@ -1,5 +1,5 @@
 {
-  "name": "node",
+  "name": "GoServer",
   "version": "0.0.1",
   "description": "-",
   "main": "server.js",
@@ -32,5 +32,6 @@
     "-"
   ],
   "author": "clique",
-  "license": "ISC"
+  "license": "ISC",
+  "main" : "server.js"
 }

@@ -4,6 +4,7 @@ var path = require('path');
 var Event = require('mongoose').model('Event');
 var Channel = require('mongoose').model('Channel');
 var mkdirp = require('mkdirp');
+var config = require('../config/config');
 
 exports.postPicture= function(request,response,next){
 	
@@ -30,7 +31,7 @@ exports.postPicture= function(request,response,next){
 						upload(request,response,function(err){
 						 	if(err) return next(err);
 						 	else{
-								url = 'http://188.166.190.3:1111/picture/'+request.file.filename+'?field='+request.query.field+'&size='+request.query.size;
+								url = 'http://'+config.IP+':'+config.PORT+'/picture/'+request.file.filename+'?field='+request.query.field+'&size='+request.query.size;
 								if(request.query.size=='small') event.picture = url;
 								else event.picture_large.push(url);
 								event.update(event,function(err){
@@ -50,7 +51,7 @@ exports.postPicture= function(request,response,next){
 						upload(request,response,function(err){
 							if(err) return next(err);
 							else{
-								url = 'http://188.166.190.3:1111/picture/'+request.file.filename+'?field='+request.query.field+'&size='+request.query.size;
+								url = 'http://'+config.IP+':'+config.PORT+'/picture/'+request.file.filename+'?field='+request.query.field+'&size='+request.query.size;
 								if(request.query.size=='small')	channel['picture']=url
 								else channel['picture_large']=url;
 								channel.update(channel,function(err){
@@ -85,7 +86,7 @@ exports.deletePicture = function(request,response,next){
 				else if(!event) response.send('event not found');
 				else{
 					if(request.query.size=='small') event.picture=null;
-					else event.picture_large.splice(event.picture_large.indexOf('http://188.166.190.3:1111/picture/'+request.params.name+'?field='+request.query.field+'&size='+request.query.size),1);
+					else event.picture_large.splice(event.picture_large.indexOf('http://'+config.IP+':'+config.PORT+'/picture/'+request.params.name+'?field='+request.query.field+'&size='+request.query.size),1);
 					event.update(event,function(err){
 						if(err) return next(err);
 						else{

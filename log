@@ -65,7 +65,12 @@
 				adjust code for skipping visit per day
 			getEvent
 				now return old
-				
+
+
+20 JUN 
+	adjust for OPENSHIFT
+		
+		ip address + port		
 
 
 
