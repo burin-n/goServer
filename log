@@ -55,7 +55,7 @@
 	update			
 		event model :
 			delete date_time
-			add date_start,date_end,old
+			add date_start,date_end,expire
 
 		event controllers :
 			updatetStatperDay
@@ -64,6 +64,7 @@
 			updatehotEvent
 				adjust code for skipping visit per day
 			getEvent
+<<<<<<< HEAD
 				now return old
 
 
@@ -71,8 +72,10 @@
 	adjust for OPENSHIFT
 		
 		ip address + port		
-
-
+=======
+				now return expire
+				
+>>>>>>> f339ad621a2455659c246f069342af768249c8a3
 
 
 

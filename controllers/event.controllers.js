@@ -18,12 +18,12 @@ exports.getEvent = function(request,response,next){
 		if(err) return next(err);
 		else if(!event) response.status(404).send('event not found');
 		else{
-			var fields = ['title','about','video','channel','location','date_start','old',
+			var fields = ['title','about','video','channel','location','date_start','expire',
 			'date_end','picture','picture_large','year_require','faculty_require','tags'];
 			if(request.query.stat) fields.push(['visit']);
 			var info = {};
 			for(var i=0; i<fields.length; i++){
-				if(event[fields[i]] || fields[i]=='old'){
+				if(event[fields[i]] || fields[i]=='expire'){
 					
 					if((fields[i]==='year_require'||fields[i]==='faculty_require')){
 						if(event[fields[i]].length>0){
@@ -131,7 +131,11 @@ exports.putStat = function(request,response,next){
 		else{
 			event.lastModified = d;
 			event.visit+=1;
-			if(!event.visit_per_day[event.visit_per_day.length-1].hasOwnProperty(date)){
+			if(event.visit_per_day.length==0){
+				event.visit_per_day.push({});
+				event.visit_per_day[0][date]=1;
+			}
+			else if(!event.visit_per_day[event.visit_per_day.length-1].hasOwnProperty(date)){
 				event.visit_per_day.push({});
 				event.visit_per_day[event.visit_per_day.length-1][date]=1;
 			}
@@ -187,10 +191,10 @@ exports.newEvent = function(request,response,next){
 exports.updateStatperDay = function(request,response,next){
  	var d = new time.Date().setTimezone('Asia/Bangkok');
  	var cnt=0;
- 	Event.find({tokenDelete:{$ne:true}},function(err,events){
+ 	Event.find({$and :[ {tokenDelete:{$ne:true}}, {expire:{$ne:true}} ]},function(err,events){
  		events.forEach(function(event){
 			if(event.date_end.getTime()<d.getTime()){
-				event.old=true;
+				event.expire=true;
 				event.update(event,function(err){
 					if(err) return next(err);
 				});
@@ -224,12 +228,10 @@ exports.updatehotEvent = function(request,response,next){
  	var d2 = d1-86400000;
  	var d3 = d2-86400000;
 
- 	
  	Event.find({tokenDelete:{$ne:true}},function(err,events){
  		for(var i=0;i<events.length;i++){
  			events[i].momentum = 0;
  			var t = Math.max(0,events[i].visit_per_day.length-3);
- 			
  			for(var j=events[i].visit_per_day.length-1;j>=t;j--){
  				for(var key in events[i].visit_per_day[j]){
  					var date = new Date(key).getTime();
@@ -249,8 +251,8 @@ exports.updatehotEvent = function(request,response,next){
 					 		var result={};
 					 		for(var key in hot){
 					 			result[key] = {};
-					 			for(var i=0;i<field.length;i++){
-					 				result[key][field[i]] = hot[key][field[i]];
+					 			for(var k=0;k<field.length;k++){
+					 				result[key][field[k]] = hot[key][field[k]];
 					 			}
 					 		}
 					 		mkdirp(path.join(__dirname,'../data/'),function(err){
@@ -267,15 +269,19 @@ exports.updatehotEvent = function(request,response,next){
 	 				}
  				}
  			}
- 			if(t<0){
+
+			if(events[i].visit_per_day.length==0){
+
  				hot = checkhot(hot,events[i]);
 		 		if(i+1==events.length){
 					var field = ['_id','title','picture','momentum'];
 					var result={};
 					for(var key in hot){
 			 			result[key] = {};
-			 			for(var i=0;i<field.length;i++){
-			 				result[key][field[i]] = hot[key][field[i]];
+
+			 			for(var k=0;k<field.length;k++){
+			 				result[key][field[k]] = hot[key][field[k]];
+
 			 			}
 			 		}
 			 		mkdirp(path.join(__dirname,'../data/'),function(err){
@@ -289,8 +295,10 @@ exports.updatehotEvent = function(request,response,next){
 				 		}
 			 		});
 	 			}				
- 			}
- 		}
+
+ 			} 	
+		}
+
  	});
 }
 
