@@ -32,6 +32,5 @@
     "-"
   ],
   "author": "clique",
-  "license": "ISC",
-  "main" : "server.js"
+  "license": "ISC"
 }
