@@ -46,7 +46,7 @@ exports.getEvent = function(request,response,next){
 
 exports.postEvent = function(request,response,next){
 	var d = new time.Date().setTimezone('Asia/Bangkok');
-	var date = d.getMonth+1 +'/'+d.getDate()+'/'+d.getFullYear();	
+	var date = d.getMonth()+1 +'/'+d.getDate()+'/'+d.getFullYear();	
 	var newEvent = new Event(request.body);
 	newEvent.visit_per_day.push({});
 	newEvent.visit_per_day[0][date]=0;
