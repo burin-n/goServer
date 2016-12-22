@@ -5,8 +5,9 @@ module.exports = function(app){
 	app.get('/channel/listall',channel.listAll);
 	app.delete('/channel/clear',channel.clear);
 
-	app.route('/channel')
-		.get(channel.getChannel)
+	// chaining : same path different request , run different function
+	app.route('/channel')		
+		.get(channel.getChannel) // request with query "id"
 		.post(channel.postChannel)
 		.put(channel.putChannel)
 		.delete(channel.deleteChannel);

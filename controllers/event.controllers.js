@@ -5,10 +5,12 @@ var path = require('path');
 var time = require('time');
 var mkdirp = require('mkdirp');
 
+//route /
 exports.hi = function(request,response,next){
 	response.send('hi');
 }
 
+//route /listall
 exports.listAll = function(request,response,next){
 	Event.find({},function(err,events){
 		if(err) return next(err);
@@ -16,18 +18,22 @@ exports.listAll = function(request,response,next){
 	});
 }
 
+//route /event?id=...&stat=bool
 exports.getEvent = function(request,response,next){
 	var id = request.query.id;
+	var info = {};
 	Event.findById(id,function(err,event){
 		if(err) return next(err);
-		else if(!event) response.status(404).send('event not found');
+		else if(!event){
+			info.msg = "event not found";
+			response.status(404).json(info);
+		}
 		else{
 			var fields = ['title','about','video','channel','location','date_start','expire',
 			'date_end','picture','picture_large','year_require','faculty_require','tags'];
 			if(request.query.stat) fields.push(['visit']);
-			var info = {};
 			for(var i=0; i<fields.length; i++){
-				if(event[fields[i]] || fields[i]=='expire'){
+				if(event[fields[i]] || fields[i]=='expire'){ // whreturn {msg:"done"/"error"}y ? field expire?
 					
 					if((fields[i]==='year_require'||fields[i]==='faculty_require')){
 						if(event[fields[i]].length>0){
@@ -44,76 +50,142 @@ exports.getEvent = function(request,response,next){
 	});
 }
 
+//route POST /event with req body
 exports.postEvent = function(request,response,next){
 	var d = new time.Date().setTimezone('Asia/Bangkok');
 	var date = d.getMonth()+1 +'/'+d.getDate()+'/'+d.getFullYear();	
 	var newEvent = new Event(request.body);
-	newEvent.visit_per_day.push({});
-	newEvent.visit_per_day[0][date]=0;
-	newEvent.save(function(err){
-		if(err) return next(err);
+	var info = {};
+	newEvent.visit_per_day.push({});	// keep stat visit per day as object
+	newEvent.visit_per_day[0][date]=0;	// set defuat of created day as 0
+	newEvent.save(function(err){		// save new event
+		if(err){
+			info.msg = "error";
+			console.error("error at postEvent : event.controllers");
+			response.json(info);
+			return next(err);	
+		} 
 		else{ 
 			var channelId = newEvent.channel;
-			var condition = {$push:{}};
-			condition.$push.events = newEvent._id;
+			var condition = {$push:{}};				// condition for update channel
+			condition.$push.events = newEvent._id;	// push newEvent id to channel events field
 			Channel.findByIdAndUpdate(channelId,condition,function(err,channel){
-				if(err) return next(err);
-				else if(!channel) response.status(404).send('channel not found');
-				else response.status(201).send(newEvent._id);
+				if(err){
+					info.msg = "error1";
+					console.error("error1 : postEvent - event.controllers");
+					response.json(info);
+					return next(err);	
+				} 
+				else if(!channel){
+					info.msg = "channel not found";
+					console.error("channel not found : postEvent - event.controllers");
+					response.status(404).json(info);
+				}
+				else{
+					info.id = newEvent._id;
+					console.log("post new Event");
+					response.status(201).json(info);
+				}
 			});
 		}
 	});
 }
 
+// route PUT /event?id=... with req body
 exports.putEvent = function(request,response,next){
 	var id = request.query.id;
+	var info = {msg:"done"};
 	Event.findByIdAndUpdate(id,{
-		$set:request.body,
-		$currentDate:{lastModified:"Date"}
+		$set:request.body,						// update body
+		$currentDate:{lastModified:"Date"}		// update lastModified
 	},function(err,updatedEvent){
-		if(err) return next(err);
-		else if(!updatedEvent) response.status(404).send('event not found');
-		else response.json("done");
+		if(err){
+			info.msg = "error";
+			response.json(info);
+			console.error("error : putEvent - event.controllers")
+			return next(err);
+		}
+		else if(!updatedEvent){
+			info.msg = "event not found";
+			console.error("event not found : putEvent - event.controllers");
+			response.status(404).json(info);
+		}
+		else response.json(info);
 	});
 }
 
-
+// route DELETE /event?id=...
+// call from deleteEvent
 var updateDeleteEventToChannel = function(channelId,eventId,response){
+	var info = {msg:"done"};
 	Channel.findById(channelId,function(err,channel){
-		if(err) response.send('Something went wrong');
-		else if(!channel) response.status(404).send('channel not found');
-		else{
+		if(err){
+			info.msg = 'error1';
+			console.error("error1 : updateDeleteEventToChannel - event.controllers");
+			response.json(info);
+			return next(err);
+		}
+		else if(!channel){
+			info.msg = "channel not found";
+			console.error("error2 : updateDeleteEventToChannel - event.controllers");
+			response.status(404).json(info);
+		}
+		else{	// move deleted event to bin array
 			channel.events_bin.push(eventId);
 			channel.events.splice(channel.events.indexOf(eventId),1);
 			channel.update(channel,function(err){
-				if(err) response.send('Something went wrong');
-				else response.send('done');
+				if(err){
+					info.msg = "error3";
+					response.json(msg);
+					console.error("error3 : updateDeleteEventToChannel - event.controllers");
+					return next(err);
+				}
+				else response.json(info);
 			});
 		}
 	});
 }
 
+//route DELETE /event?id=...
 exports.deleteEvent = function(request,response,next){
 	var id = request.query.id;
+	var info = {msg:"done"};
 	Event.findByIdAndUpdate(id,{
-		tokenDelete:true,
-		lastModified:Date()
+		tokenDelete:true,		// set tokenDelete
+		lastModified:Date()		// update lastModified
 	},function(err,event){
-		if (err) return next(err);
-		else if(!event) response.send('event not found');
+		if (err){
+			info.msg = "error";
+			console.error("error : deleteEvent - event.controllers");
+			response.json(info);
+			return next(err);
+		}
+		else if(!event){
+			info.msg = 'event not found';
+			console.error("event not found : deleteEvent - event.controllers");
+			response.json(info);
+		}
 		else updateDeleteEventToChannel(event.channel,id,response);
 	});
 }
 
-
+//route GET /event/stat?id=...
 exports.getStat = function(request,response,next){
 	var id = request.query.id;
+	var info = {};
 	Event.findById(id,function(err,event){
-		if(err) return next(err);
+		if(err){
+			info.msg = "error";
+			console.error("error find event: getStat - event.controllers");
+			response.json(info);
+			return next(err);
+		}
 		else{
-			if(!event) response.status(404).send("event not found");
+			if(!event){
+				info.msg = "event not found";
+				response.status(404).json(info);
+			}
 			else{
-				var info={};
 				var fields = ['visit','visit_per_day'];
 				for(var i=0;i<fields.length;i++){
 					info[fields[i]]=event[fields[i]];
@@ -124,67 +196,119 @@ exports.getStat = function(request,response,next){
 	});
 }
 
+//route PUT /event/stat?id=...
 exports.putStat = function(request,response,next){
 	var id = request.query.id;
 	var d = new time.Date().setTimezone('Asia/Bangkok');
 	var date = d.getMonth()+1+'/'+d.getDate()+'/'+d.getFullYear();
-
+	var info={};
 	Event.findById(id,function(err,event){
-		if(err) return next(err);
-		else if(!event) response.status(404).send('event not found');
+		if(err){
+			info.msg = "error";
+			response.json(info);
+			console.error("error find event : putStat - event.controllers");
+			return next(err);
+		}
+		else if(!event){
+			info.msg = "event not found";
+			response.status(404).json(info);
+		}
 		else{
 			event.lastModified = d;
-			event.visit+=1;
-			if(event.visit_per_day.length==0){
+			event.visit+=1;								//add visit
+			if(event.visit_per_day.length==0){			//add object to empty array
 				event.visit_per_day.push({});
 				event.visit_per_day[0][date]=1;
 			}
+			// add date for the first visit for the day
 			else if(!event.visit_per_day[event.visit_per_day.length-1].hasOwnProperty(date)){
 				event.visit_per_day.push({});
 				event.visit_per_day[event.visit_per_day.length-1][date]=1;
 			}
+			// add visit_per_day
 			else event.visit_per_day[event.visit_per_day.length-1][date]+=1;
+			
 			event.update(event,function(err){
-				if(err) return next(err);
-				else response.send('done');
-			});
-		}
-	});
-}
-
-exports.clear = function(request,response,next){
-	var id = request.query.id;
-	Event.findByIdAndRemove(id,function(err,event){
-		if(err) response.send(err);
-		else {
-			Channel.findById(event.channel,function(err,channel){
-				if(err) response.send('somgthing went wrong');
-				else if(!channel) response.send('channel not found');
+				if(err){
+					info.msg = "error1";
+					response.json(info);
+					console.error("error1 update event : putStat - event.controllers");
+					return next(err);
+				}
 				else{
-					channel.events.splice(channel.events.indexOf(id),1);
-					channel.update(channel,function(err){
-						if(err) return next(err);
-						else response.send('removed:'+id);		
-					})
+					info.msg = "done";
+					resposne.json(info);
 				}
 			});
 		}
 	});
 }
 
+//route DELETE /event/clear?id=...
+//use in test, delte event from database
+exports.clear = function(request,response,next){
+	var id = request.query.id;
+	var info = {};
+	Event.findByIdAndRemove(id,function(err,event){
+		if(err) {
+			info.msg = "error";
+			response.json(info);
+			console.error("error find&removed event : clear - event.controllers");
+			return next(err);
+		}
+		else { // callback hell oh no!
+			Channel.findById(event.channel,function(err,channel){
+				if(err) {
+					info.msg = "error1";
+					response.json(info);
+					console.error("error find channel : clear - event.controllers");
+					return next(err);
+				}
+				else if(!channel){
+					info.msg = "channel not found";
+					response.json(info);
+					console.error("channel not found : clear - event.controllers");
+				}
+				else{
+					channel.events.splice(channel.events.indexOf(id),1);
+					channel.update(channel,function(err){
+						if(err) {
+							info.msg = "error2";
+							response.json(info);
+							console.error("error update channel : clear - event.controllers");
+							return next(err);
+						}
+						else{
+							info.removed = id;
+							response.json(info);
+						}
+					});
+				}
+			});
+		}
+	});
+}
+
+//route GET /event/new(optional)?top=...
 exports.newEvent = function(request,response,next){
+	//tokenDelete must not be true
+	var info={};
 	Event.find({tokenDelete:{$ne:true}},function(err,events){
-		if(err) return next(err);
+		if(err){
+			info.msg = "error";
+			console.error("error find event : newEvent - event.controllers");
+			return next(err);
+		}
 		else {
-			var info = [] ;
+			var info.events = [];
 			var fields = ['_id','title','picture','location','date_time'] ;
 			var index = 0;
 			var terminator = (request.query.top) ? (Math.max(0,events.length-request.query.top)) : 0;
 			for(var j=events.length-1; j>=terminator;j--){
-				info[index] = {};
+				info.events[index] = {};
 				for(var i=0; i<fields.length; i++){
 					info[index][fields[i]] = events[j][fields[i]];
-					}
+				}
 				index++;
 			}
 			response.json(info);
@@ -192,18 +316,29 @@ exports.newEvent = function(request,response,next){
 	});
 }
 
+//route GET /update/perday
+//set expire if it's out of active date
 exports.updateStatperDay = function(request,response,next){
  	var d = new time.Date().setTimezone('Asia/Bangkok');
  	var cnt=0;
+ 	var info={};
  	Event.find({$and :[ {tokenDelete:{$ne:true}}, {expire:{$ne:true}} ]},function(err,events){
  		events.forEach(function(event){
 			if(event.date_end.getTime()<d.getTime()){
 				event.expire=true;
 				event.update(event,function(err){
-					if(err) return next(err);
+					if(err){
+						info.msg = "error";
+						response.json(info);
+						console.error("error update event : updateStatperDay : event.controllers");
+						return next(err);
+					}
 				});
 			}
-			if(++cnt==events.length) response.send('done');
+			if(++cnt===events.length){
+				info.msg = "done";
+				response.json(msg);
+			}
 		});	
 	});
 }
@@ -224,7 +359,7 @@ var checkhot = function(hot,event){
 	return hot;
 }
 
-
+//route /update/hot
 exports.updatehotEvent = function(request,response,next){
  	var hot = {};
  	var t = new time.Date().setTimezone('Asia/Bangkok');
@@ -232,6 +367,7 @@ exports.updatehotEvent = function(request,response,next){
  	var d2 = d1-86400000;
  	var d3 = d2-86400000;
 
+ 	// all event that is not delete
  	Event.find({tokenDelete:{$ne:true}},function(err,events){
  		for(var i=0;i<events.length;i++){
  			events[i].momentum = 0;
@@ -307,28 +443,39 @@ exports.updatehotEvent = function(request,response,next){
 }
 
 
-
+//route /event/hot
 exports.gethotEvent = function(request,response,next){
 	response.sendFile(path.join(__dirname,'../data/hotEvent.json'));
 }
 
 
 
-
+//route /event/search?keyword=...
 exports.searchEvent = function(request,response,next){
+	//$option i : case insensitive
+	var info={};
 	Event.find( {$and : [ {title: { $regex:request.query.keyword,$options:"i"}}, {tokenDelete:false}] } ,
 		function(err,events){
-			if(err) return next(err);
-			else if(events.length==0) response.status(404).send('event not found');
+			if(err){
+				info.msg = "error";
+				response.json(info);
+				return next(err);	
+			}
+			else if(events.length==0){
+				info.msg = "event not found";
+				response.status(404).json(info);
+			}
 			else {
 				var fields = ['_id','title','picture','channel','location','date_time'];
-				var info = [];
+				var info.events = [];
 				for(var j=0; j<events.length;j++){
-					info.push({});
+					// add found event in array info.events
+					info.events.push({});
 					for(var i=0; i<fields.length; i++){
-					 	info[j][fields[i]] = events[j][fields[i]];
+					 	info.events[j][fields[i]] = events[j][fields[i]];
 					}
 				}
+				// info is {events:[ {},{},.. ]}
 				response.json(info);
 			}
 	});

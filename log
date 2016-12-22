@@ -81,3 +81,55 @@
 
 
 
+21 DEC 2016
+
+	GET /channel : now return json {msg:"channel not found"} 
+	change time zone form asia/bangkok to Asia/Bangkok
+	POST /channel : now return json {msg:"error"} or {id:newChannel_id}
+	PUT /channel : now return json {msg:"error/../done"}
+	DELETE /channel :  add console.error & return in {msg:"done/error"}
+
+22 DEC 2016
+	
+	GET /channel/stat : return json with "msg" field if found error
+	GET /channel/search : 
+		return json with "msg" field if found error
+		return {channels:[ {}, {channel} ,...]} otherwise
+
+	GET /event : return json with "msg" field if found error
+	POST /event : 
+		return json with "msg" field if found error 
+		return json with "id" field if success
+
+	PUT /event : return {msg:"done"/"error"}
+	DELETE /event : return {msg:"done"/"error"}
+
+	GET /event/stat : return json with "msg" field if found error 
+
+	PUT /event/stat : return {msg:"done"/"error"}
+
+	DELETE / event/clear :
+		return {msg:"error"} / {removed:id}
+
+	GET /event/new(optional)?top=... :
+		return {msg:"error"} if found error
+		return {events:[]} otherwise
+
+	GET /update/perday :
+		return {msg:"error"/"done"}
+
+	GET /event/search :
+		return {msg:"error}
+		return {events:[ {},{event},.. ]}
+
+	POST /picture : return string "sth went wrong"/"done"
+
+	
+	DELETE /picture/:name : return "error msg"/"done"
+
+	POST /tags/modify : return "error/done"
+
+	GET /tags/search :
+		return {msg:error} if error
+		return {events: [ {},{events},..]}
+		

@@ -2,13 +2,13 @@ var mongoose = require('mongoose');
 var config = require('./config');
 
 module.exports = function(){
-	mongoose.set('debug',config.debug);
+	mongoose.set('debug',config.debug);			// mode
 	var db = mongoose.connect(config.mongoUri); // connect to database
 	
-	
-	require('../models/event.model'); // create collection
+	// create collection
+	require('../models/event.model'); 
 	require('../models/channel.model');
 	require('../models/user.model');
 
-	return db;
+	return db; // database with setting
 }
